@@ -1,0 +1,123 @@
+############################################################################
+# Sample Configuration - ELB Listener Module
+############################################################################
+
+region      = "us-east-1"
+client      = "pragma"
+project     = "mcp"
+environment = "dev"
+
+common_tags = {
+  client        = "pragma"
+  environment   = "dev"
+  project       = "mcp"
+  functionality = "agent-cloudops"
+  owner         = "cloudops-team"
+  area          = "infrastructure"
+  provisioned   = "terraform"
+  application   = "agent-cloudops"
+}
+
+############################################################################
+# Listener Configuration
+############################################################################
+
+listener_config = {
+  "api-config" = {
+    load_balancer_arn = ""  # Se obtiene automáticamente del data source
+    application_id    = "api"
+
+    listeners = [
+      {
+        protocol                = "HTTP"
+        port                    = "80"
+        certificate             = ""
+        default_target_group_id = "api-default"
+        additional_tags         = {}
+
+        rules = [
+          {
+            priority              = 100
+            target_application_id = "api-payments"
+            action = {
+              type = "forward"
+            }
+            conditions = [
+              {
+                host_headers = []
+                path_patterns = [
+                  {
+                    patterns = ["/payments/*"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            priority              = 200
+            target_application_id = "api-users"
+            action = {
+              type = "forward"
+            }
+            conditions = [
+              {
+                host_headers = []
+                path_patterns = [
+                  {
+                    patterns = ["/users/*", "/profile/*"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
+    target_groups = [
+      {
+        target_application_id = "api-default"
+        port                  = "8080"
+        protocol              = "HTTP"
+        vpc_id                = ""  # Se obtiene automáticamente del data source
+        target_type           = "ip"
+        healthy_threshold     = "3"
+        interval              = "30"
+        path                  = "/health"
+        unhealthy_threshold   = "3"
+        matcher               = "200"
+        additional_tags       = {}
+      },
+      {
+        target_application_id = "api-payments"
+        port                  = "8081"
+        protocol              = "HTTP"
+        vpc_id                = ""  # Se obtiene automáticamente del data source
+        target_type           = "ip"
+        healthy_threshold     = "3"
+        interval              = "30"
+        path                  = "/payments/health"
+        unhealthy_threshold   = "3"
+        matcher               = "200"
+        additional_tags = {
+          Service = "Payments"
+        }
+      },
+      {
+        target_application_id = "api-users"
+        port                  = "8082"
+        protocol              = "HTTP"
+        vpc_id                = ""  # Se obtiene automáticamente del data source
+        target_type           = "ip"
+        healthy_threshold     = "3"
+        interval              = "30"
+        path                  = "/users/health"
+        unhealthy_threshold   = "3"
+        matcher               = "200"
+        additional_tags = {
+          Service = "Users"
+        }
+      }
+    ]
+  }
+}
