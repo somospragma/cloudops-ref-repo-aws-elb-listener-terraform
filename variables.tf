@@ -54,6 +54,15 @@ variable "listener_config" {
         action = object({
           type = string
         })
+        jwt_validation = optional(object({
+          issuer        = string
+          jwks_endpoint = string
+          additional_claims = optional(list(object({
+            format = string
+            name   = string
+            values = list(string)
+          })), [])
+        }))
         conditions = list(object({
           host_headers = optional(list(object({
             headers = list(string)

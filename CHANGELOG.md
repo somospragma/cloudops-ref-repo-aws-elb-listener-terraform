@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-02
+
+### Added
+- JWT Verification support for Application Load Balancer listener rules
+- Optional `jwt_validation` configuration block in listener rules
+- Support for JWT issuer and JWKS endpoint configuration
+- Support for additional JWT claims validation (up to 10 claims)
+- Three claim formats: single-string, string-array, space-separated-values
+- Action ordering support (JWT validation executes before forward action)
+- Comprehensive JWT examples in EXAMPLE_JWT.md
+- JWT verification documentation in README
+
+### Changed
+- Updated `variables.tf` to include optional `jwt_validation` object in rules
+- Updated `main.tf` to support dynamic JWT validation action with proper ordering
+- Enhanced README with JWT verification example and documentation
+- Updated listener_config structure documentation
+
+### Features
+- ✅ JWT token signature validation at ALB level
+- ✅ Automatic validation of mandatory claims (iss, exp)
+- ✅ Optional validation of nbf and iat claims
+- ✅ Custom additional claims validation
+- ✅ Pre-routing authentication for secure APIs
+- ✅ Backward compatible (JWT validation is optional)
+
+### Requirements
+- Terraform >= 1.0
+- AWS Provider >= 4.31.0
+- HTTPS listener required for JWT verification
+- Publicly accessible JWKS endpoint
+
+### Notes
+- JWT verification only works with HTTPS listeners
+- Only RS256 algorithm is supported by AWS ALB
+- JWT validation action executes before forward action (order: 1 vs 2)
+- Existing configurations without JWT validation continue to work unchanged
+
 ## [1.0.0] - 2026-01-26
 
 ### Added
