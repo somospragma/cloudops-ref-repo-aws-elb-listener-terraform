@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-02
+
+### Added
+- Fixed Response action support for listener rules
+- Optional `fixed_response` configuration block in listener rules
+- Support for static HTTP responses without backend targets
+- Five content types: text/plain, text/css, text/html, application/javascript, application/json
+- Flexible status codes: specific (200, 404, 503) or patterns (2XX, 4XX, 5XX)
+- Optional message body for custom response content
+- Comprehensive fixed response examples in EXAMPLE_FIXED_RESPONSE.md
+- Fixed response documentation in README
+
+### Changed
+- Made `target_application_id` optional in listener rules (required only for forward actions)
+- Updated `main.tf` to support conditional action types (forward vs fixed-response)
+- Enhanced validation to ensure correct configuration per action type
+- Updated listener_config structure documentation
+
+### Features
+- ✅ Static responses without backend processing
+- ✅ Health check endpoints without target groups
+- ✅ Maintenance mode pages
+- ✅ Custom error pages (404, 503, etc.)
+- ✅ API responses (JSON, plain text)
+- ✅ Cost-effective (no backend data transfer)
+- ✅ Backward compatible (existing forward actions unchanged)
+
+### Requirements
+- Terraform >= 1.0
+- AWS Provider >= 4.31.0
+- Valid content type from supported list
+- Valid status code (specific or pattern)
+
+### Notes
+- Fixed response rules don't require target groups
+- Message body is optional but recommended for user-friendly responses
+- Fixed responses are faster and more cost-effective than forwarding
+- Can be mixed with forward and JWT validation actions in same listener
+
 ## [1.1.0] - 2026-02-02
 
 ### Added
