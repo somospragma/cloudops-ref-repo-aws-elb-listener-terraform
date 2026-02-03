@@ -77,9 +77,42 @@ resource "aws_lb_listener_rule" "listener_rule" {
   listener_arn = aws_lb_listener.lb_listener[each.value.listener_key].arn
   priority     = each.value.rule.priority
 
+  dynamic "action" {
+    for_each = each.value.rule.jwt_validation != null ? [1] : []
+    content {
+      type  = "jwt-validation"
+      order = 1
+
+      jwt_validation {
+        issuer        = each.value.rule.jwt_validation.issuer
+        jwks_endpoint = each.value.rule.jwt_validation.jwks_endpoint
+
+        dynamic "additional_claim" {
+          for_each = each.value.rule.jwt_validation.additional_claims
+          content {
+            format = additional_claim.value.format
+            name   = additional_claim.value.name
+            values = additional_claim.value.values
+          }
+        }
+      }
+    }
+  }
+
   action {
-    type             = each.value.rule.action.type
-    target_group_arn = aws_lb_target_group.lb_target_group[each.value.rule.target_application_id].arn
+    type  = each.value.rule.action.type
+    order = each.value.rule.jwt_validation != null ? 2 : 1
+
+    target_group_arn = each.value.rule.action.type == "forward" ? aws_lb_target_group.lb_target_group[each.value.rule.target_application_id].arn : null
+
+    dynamic "fixed_response" {
+      for_each = each.value.rule.action.type == "fixed-response" ? [1] : []
+      content {
+        content_type = each.value.rule.fixed_response.content_type
+        message_body = each.value.rule.fixed_response.message_body
+        status_code  = each.value.rule.fixed_response.status_code
+      }
+    }
   }
 
   dynamic "condition" {

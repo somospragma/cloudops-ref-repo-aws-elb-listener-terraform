@@ -50,10 +50,24 @@ variable "listener_config" {
 
       rules = list(object({
         priority              = number
-        target_application_id = string
+        target_application_id = optional(string)
         action = object({
           type = string
         })
+        fixed_response = optional(object({
+          content_type = string
+          message_body = optional(string)
+          status_code  = string
+        }))
+        jwt_validation = optional(object({
+          issuer        = string
+          jwks_endpoint = string
+          additional_claims = optional(list(object({
+            format = string
+            name   = string
+            values = list(string)
+          })), [])
+        }))
         conditions = list(object({
           host_headers = optional(list(object({
             headers = list(string)
@@ -147,5 +161,18 @@ variable "listener_config" {
       length(config.target_groups) > 0
     ])
     error_message = "Cada configuración debe tener al menos un target group."
+  }
+
+  validation {
+    condition = alltrue([
+      for key, config in var.listener_config : alltrue([
+        for listener in config.listeners : alltrue([
+          for rule in listener.rules :
+          (rule.action.type == "forward" && rule.target_application_id != null) ||
+          (rule.action.type == "fixed-response" && rule.fixed_response != null)
+        ])
+      ])
+    ])
+    error_message = "Las reglas con action.type='forward' requieren target_application_id. Las reglas con action.type='fixed-response' requieren fixed_response."
   }
 }
