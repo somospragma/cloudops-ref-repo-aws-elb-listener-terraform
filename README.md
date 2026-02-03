@@ -655,5 +655,9 @@ Para consultas o problemas con este módulo, contactar al equipo de CloudOps de 
 ---
 
 **Versión:** 1.0.0  
-**Última actualización:** 2026-01-26  
+**Última actualización:** 2026-02-02  
 **Mantenido por:** Pragma CloudOps Team
+
+---
+
+> Este módulo ha sido desarrollado siguiendo los estándares de Pragma CloudOps, garantizando una implementación segura, escalable y optimizada que cumple con todas las políticas de la organización. Pragma CloudOps recomienda revisar este código con su equipo de infraestructura antes de implementarlo en producción.
