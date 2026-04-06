@@ -10,7 +10,7 @@
 resource "aws_lb_target_group" "lb_target_group" {
   provider    = aws.project
   for_each    = local.flattened_target_groups
-  name        = join("-", [var.environment, "target", each.key])
+  name        = local.target_group_names[each.key]
   port        = each.value.target_group.port
   protocol    = each.value.target_group.protocol
   vpc_id      = each.value.target_group.vpc_id
@@ -26,14 +26,20 @@ resource "aws_lb_target_group" "lb_target_group" {
     path                = each.value.target_group.path
   }
 
+  # Stickiness dinámico (PC-IAC-014)
+  dynamic "stickiness" {
+    for_each = each.value.target_group.stickiness != null ? [each.value.target_group.stickiness] : []
+    content {
+      enabled         = stickiness.value.enabled
+      type            = stickiness.value.type
+      cookie_duration = stickiness.value.cookie_duration
+      cookie_name     = stickiness.value.type == "app_cookie" ? stickiness.value.cookie_name : null
+    }
+  }
+
+  # Tags (PC-IAC-004): Solo Name + additional_tags, transversales vienen de default_tags
   tags = merge(
-    {
-      Name           = join("-", [var.environment, "target", each.key])
-      application_id = each.key
-      client         = var.client
-      project        = var.project
-      environment    = var.environment
-    },
+    { Name = local.target_group_names[each.key] },
     each.value.target_group.additional_tags
   )
 }
@@ -57,13 +63,9 @@ resource "aws_lb_listener" "lb_listener" {
   port              = each.value.listener.port
   protocol          = each.value.listener.protocol
 
+  # Tags (PC-IAC-004)
   tags = merge(
-    {
-      Name        = join("-", [var.environment, "listener", each.key])
-      client      = var.client
-      project     = var.project
-      environment = var.environment
-    },
+    { Name = local.listener_names[each.key] },
     lookup(each.value.listener, "additional_tags", {})
   )
 }
@@ -134,10 +136,8 @@ resource "aws_lb_listener_rule" "listener_rule" {
     }
   }
 
+  # Tags (PC-IAC-004)
   tags = {
-    Name        = join("-", [var.environment, "rule", each.key])
-    client      = var.client
-    project     = var.project
-    environment = var.environment
+    Name = local.rule_names[each.key]
   }
 }

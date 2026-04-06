@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-04-06
+
+### Added
+- Stickiness support for Target Groups (lb_cookie and app_cookie)
+- Optional `stickiness` configuration block in target groups
+
+### Changed
+- **BREAKING**: Target Group naming now follows PC-IAC-003 convention: `{client}-{project}-{environment}-tg-{key}` (previously `{environment}-target-{key}`)
+- **BREAKING**: Listener naming now follows PC-IAC-003: `{client}-{project}-{environment}-listener-{key}`
+- **BREAKING**: Rule naming now follows PC-IAC-003: `{client}-{project}-{environment}-rule-{key}`
+- Naming construction centralized in `locals.tf` per PC-IAC-003
+- Tags cleaned per PC-IAC-004: removed hardcoded `client`, `project`, `environment` from resource tags (now come from provider `default_tags`)
+- Tags now only contain `Name` + `additional_tags` per PC-IAC-004
+- Removed non-standard documentation files (JWT_IMPLEMENTATION.md, EXAMPLE_JWT.md, FIXED_RESPONSE_IMPLEMENTATION.md, EXAMPLE_FIXED_RESPONSE.md) per PC-IAC-001
+- Renamed `sample/terraform.tfvars.example` to `sample/terraform.tfvars` per PC-IAC-001
+
+### Migration Guide
+- Existing target groups will be recreated due to name change
+- Tags `client`, `project`, `environment` must come from provider `default_tags`
+- Stickiness is optional (null by default), no impact on existing configs
+
 ## [1.2.0] - 2026-02-02
 
 ### Added

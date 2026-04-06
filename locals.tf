@@ -1,8 +1,11 @@
 ############################################################################
-# Local Values - Transformaciones para Target Groups, Listeners y Rules
+# Local Values - Nomenclatura y Transformaciones (PC-IAC-003, PC-IAC-012)
 ############################################################################
 
 locals {
+  # Prefijo de gobernanza (PC-IAC-003)
+  governance_prefix = "${var.client}-${var.project}-${var.environment}"
+
   # Transformar los target groups para facilitar su referencia
   target_groups_map = {
     for key, config in var.listener_config :
@@ -20,6 +23,12 @@ locals {
       for tg_key, tg in tg_map : tg_key => merge(tg, { config_key = config_key })
     }
   ]...)
+
+  # Nombres de target groups (PC-IAC-003)
+  target_group_names = {
+    for key, tg in local.flattened_target_groups :
+    key => "${local.governance_prefix}-tg-${key}"
+  }
 
   # Transformar los listeners para facilitar su referencia
   listeners_map = {
@@ -41,6 +50,12 @@ locals {
     }
   ]...)
 
+  # Nombres de listeners (PC-IAC-003)
+  listener_names = {
+    for key, listener in local.flattened_listeners :
+    key => "${local.governance_prefix}-listener-${key}"
+  }
+
   # Transformar las reglas de listener para facilitar su referencia
   listener_rules = flatten([
     for config_key, config in var.listener_config : [
@@ -60,5 +75,11 @@ locals {
   # Convertir las reglas a un mapa para usar con for_each
   listener_rules_map = {
     for rule in local.listener_rules : rule.key => rule
+  }
+
+  # Nombres de rules (PC-IAC-003)
+  rule_names = {
+    for key, rule in local.listener_rules_map :
+    key => "${local.governance_prefix}-rule-${key}"
   }
 }

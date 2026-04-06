@@ -34,8 +34,9 @@ Este módulo forma parte de una arquitectura de separación de responsabilidades
 - ✅ Soporte para múltiples target groups
 - ✅ Soporte para múltiples listeners
 - ✅ Soporte para múltiples reglas por listener
-- ✅ Nomenclatura estandarizada
-- ✅ Sistema de etiquetado en 3 niveles
+- ✅ Soporte para **Stickiness** en Target Groups (lb_cookie y app_cookie)
+- ✅ Nomenclatura estandarizada PC-IAC-003
+- ✅ Sistema de etiquetado PC-IAC-004
 - ✅ Validaciones exhaustivas
 - ✅ PC-IAC compliance
 
@@ -85,25 +86,25 @@ module "listeners" {
 
 ### Target Groups
 ```
-{environment}-target-{application_id}
+{client}-{project}-{environment}-tg-{application_id}
 ```
 
 Ejemplos:
-- `dev-target-api-payments`: Target group para API de pagos en desarrollo
-- `pdn-target-web-frontend`: Target group para frontend web en producción
+- `pragma-sopp-dev-tg-sandbox`: Target group para sandbox en desarrollo
+- `pragma-api-pdn-tg-payments`: Target group para API de pagos en producción
 
 ### Listeners
 ```
-{environment}-listener-{application_id}-{port}
+{client}-{project}-{environment}-listener-{application_id}-{port}
 ```
 
 Ejemplos:
-- `dev-listener-api-443`: Listener HTTPS en puerto 443 para API en desarrollo
-- `pdn-listener-web-80`: Listener HTTP en puerto 80 para web en producción
+- `pragma-sopp-dev-listener-sandbox-8080`: Listener HTTP en puerto 8080
+- `pragma-api-pdn-listener-api-443`: Listener HTTPS en puerto 443
 
 ### Listener Rules
 ```
-{environment}-rule-{target_application_id}-{priority}
+{client}-{project}-{environment}-rule-{target_application_id}-{priority}
 ```
 
 ## Uso del Módulo
@@ -409,7 +410,7 @@ module "api_jwt_listeners" {
 }
 ```
 
-**Ver más ejemplos en:** [EXAMPLE_JWT.md](./EXAMPLE_JWT.md)
+Para más detalles sobre JWT Verification, consultar la documentación de AWS ALB.
 
 ### Ejemplo - Fixed Response para Health Checks
 
@@ -484,7 +485,7 @@ module "alb_health_check" {
 }
 ```
 
-**Ver más ejemplos en:** [EXAMPLE_FIXED_RESPONSE.md](./EXAMPLE_FIXED_RESPONSE.md)
+Para más detalles sobre Fixed Response, consultar la documentación de AWS ALB.
 
 ## Variables de Entrada
 
@@ -552,6 +553,12 @@ map(object({
     unhealthy_threshold   = string  # Checks fallidos (2-10)
     matcher               = optional(string)  # Códigos HTTP válidos
     additional_tags       = optional(map(string))
+    stickiness = optional(object({  # Configuración de stickiness
+      enabled         = bool
+      type            = string           # "lb_cookie" o "app_cookie"
+      cookie_duration = optional(number) # Duración en segundos (default 86400)
+      cookie_name     = optional(string) # Solo para app_cookie
+    }))
   }))
 }))
 ```
@@ -654,8 +661,8 @@ Para consultas o problemas con este módulo, contactar al equipo de CloudOps de 
 
 ---
 
-**Versión:** 1.0.0  
-**Última actualización:** 2026-02-02  
+**Versión:** 1.0.2  
+**Última actualización:** 2026-04-06  
 **Mantenido por:** Pragma CloudOps Team
 
 ---
