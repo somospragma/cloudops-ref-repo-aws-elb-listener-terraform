@@ -91,6 +91,12 @@ variable "listener_config" {
       unhealthy_threshold   = string
       matcher               = optional(string, "200")
       additional_tags       = optional(map(string), {})
+      stickiness = optional(object({
+        enabled         = bool
+        type            = string           # "lb_cookie" o "app_cookie"
+        cookie_duration = optional(number, 86400)
+        cookie_name     = optional(string, null)
+      }), null)
     }))
   }))
 
