@@ -24,11 +24,11 @@ variable "project" {
 
 variable "environment" {
   type        = string
-  description = "Entorno de despliegue (dev, qa, pdn) usado en la nomenclatura de recursos"
+  description = "Entorno de despliegue (dev, qa, pdn, prod) usado en la nomenclatura de recursos"
 
   validation {
-    condition     = contains(["dev", "qa", "pdn"], lower(var.environment))
-    error_message = "El entorno debe ser uno de: dev, qa, pdn (case insensitive)."
+    condition     = contains(["dev", "qa", "pdn", "prod"], lower(var.environment))
+    error_message = "El entorno debe ser uno de: dev, qa, pdn, prod (case insensitive)."
   }
 }
 
