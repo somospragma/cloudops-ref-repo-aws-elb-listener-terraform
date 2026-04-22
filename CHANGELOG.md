@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-22
+
+### Added
+- Cognito Authentication support for Application Load Balancer listener rules
+- Optional `authenticate_cognito` configuration block in listener rules
+- Support for user_pool_arn, user_pool_client_id, user_pool_domain configuration
+- Support for session_timeout, scope, and on_unauthenticated_request options
+- New action type `authenticate-cognito-forward` for combined auth + forward
+- Automatic redirect to Cognito login for unauthenticated users
+
+### Features
+- ✅ ALB-managed Cognito authentication (no app changes required)
+- ✅ Automatic redirect to Cognito Hosted UI
+- ✅ Session management via ALB cookies
+- ✅ Configurable session timeout (default: 7 days)
+- ✅ Configurable OAuth scopes
+- ✅ Backward compatible (authenticate_cognito is optional)
+
+### Requirements
+- HTTPS listener required for Cognito authentication
+- Cognito User Pool with configured App Client
+- Callback URL configured in Cognito: `https://<domain>/oauth2/idpresponse`
+
 ## [1.0.3] - 2026-04-13
 
 ### Changed

@@ -68,6 +68,14 @@ variable "listener_config" {
             values = list(string)
           })), [])
         }))
+        authenticate_cognito = optional(object({
+          user_pool_arn       = string
+          user_pool_client_id = string
+          user_pool_domain    = string
+          session_timeout     = optional(number, 604800)
+          scope               = optional(string, "openid")
+          on_unauthenticated_request = optional(string, "authenticate")
+        }))
         conditions = list(object({
           host_headers = optional(list(object({
             headers = list(string)
@@ -175,10 +183,11 @@ variable "listener_config" {
         for listener in config.listeners : alltrue([
           for rule in listener.rules :
           (rule.action.type == "forward" && rule.target_application_id != null) ||
-          (rule.action.type == "fixed-response" && rule.fixed_response != null)
+          (rule.action.type == "fixed-response" && rule.fixed_response != null) ||
+          (rule.action.type == "authenticate-cognito-forward" && rule.authenticate_cognito != null && rule.target_application_id != null)
         ])
       ])
     ])
-    error_message = "Las reglas con action.type='forward' requieren target_application_id. Las reglas con action.type='fixed-response' requieren fixed_response."
+    error_message = "Las reglas con action.type='forward' requieren target_application_id. Las reglas con action.type='fixed-response' requieren fixed_response. Las reglas con action.type='authenticate-cognito-forward' requieren authenticate_cognito y target_application_id."
   }
 }
