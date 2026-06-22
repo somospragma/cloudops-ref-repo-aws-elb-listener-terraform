@@ -71,8 +71,17 @@ resource "aws_lb_listener" "lb_listener" {
 }
 
 ############################################################################
-# Listener Rules
+# Target Group Attachments (PC-IAC-010)
+# Registra targets en cada target group — soporta EC2 (instance), IP y Lambda
 ############################################################################
+resource "aws_lb_target_group_attachment" "targets" {
+  provider = aws.project
+  for_each = local.flattened_targets
+
+  target_group_arn = aws_lb_target_group.lb_target_group[each.value.tg_key].arn
+  target_id        = each.value.target.id
+  port             = each.value.target.port
+}
 resource "aws_lb_listener_rule" "listener_rule" {
   provider     = aws.project
   for_each     = local.listener_rules_map

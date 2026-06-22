@@ -82,4 +82,17 @@ locals {
     for key, rule in local.listener_rules_map :
     key => "${local.governance_prefix}-rule-${key}"
   }
+
+  # Aplanar los targets para registrar en cada target group (PC-IAC-012)
+  flattened_targets = {
+    for item in flatten([
+      for tg_key, tg in local.flattened_target_groups : [
+        for idx, target in tg.target_group.targets : {
+          key      = "${tg_key}-target-${idx}"
+          tg_key   = tg_key
+          target   = target
+        }
+      ]
+    ]) : item.key => item
+  }
 }

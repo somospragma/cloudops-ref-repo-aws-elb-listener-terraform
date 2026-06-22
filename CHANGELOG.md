@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - 2026-04-22
+## [1.0.5] - 2026-06-22
+
+### Added
+- Target registration support via `targets` field in `target_groups`
+- New `aws_lb_target_group_attachment` resource to register EC2 instances, IPs or Lambda ARNs
+- `targets` is optional (empty list by default) — backward compatible with all existing configurations
+- Supports all target types: `instance` (EC2 ID), `ip` (IP address), `lambda` (Lambda ARN)
+- Optional `port` override per target
+
+### Notes
+- ECS services self-register and do not need this field
+- EC2 instances require explicit target registration via this field
+- Lambda targets also require explicit registration
+
+
 
 ### Added
 - Cognito Authentication support for Application Load Balancer listener rules

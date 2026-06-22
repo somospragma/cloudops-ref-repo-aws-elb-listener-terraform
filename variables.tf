@@ -105,6 +105,10 @@ variable "listener_config" {
         cookie_duration = optional(number, 86400)
         cookie_name     = optional(string, null)
       }), null)
+      targets = optional(list(object({
+        id   = string
+        port = optional(number)
+      })), [])
     }))
   }))
 
@@ -140,6 +144,9 @@ variable "listener_config" {
       - unhealthy_threshold: (string) Unhealthy threshold (2-10)
       - matcher: (optional, string) HTTP codes for successful health checks
       - additional_tags: (optional, map) Additional tags for the target group
+      - targets: (optional, list) List of targets to register in the target group
+        - id: (string) Target ID — instance ID for EC2, IP for ip type, Lambda ARN for lambda type
+        - port: (optional, number) Port override for this specific target
   EOF
 
   validation {
